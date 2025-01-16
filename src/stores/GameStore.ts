@@ -104,13 +104,22 @@ export const useGameStore = defineStore('game', () => {
     if (!socket.value) return;
 
     socket.value.on('connect', () => {
-      emitGameUpdate();
+      // Solicita o estado atual do jogo ao conectar
+      if (codigo.value) {
+        socket.value?.emit('getGame', { code: codigo.value });
+      }
     });
 
     socket.value.on('disconnect', () => {
       if (interval) {
         clearInterval(interval);
         interval = null;
+      }
+    });
+
+    socket.value.on('gameData', (data: GameState) => {
+      if (data.code === codigo.value) {
+        updateGameState(data);
       }
     });
 
@@ -131,7 +140,9 @@ export const useGameStore = defineStore('game', () => {
     });
 
     socket.value.on('gameUpdated', (data: GameState) => {
-      updateGameState(data);
+      if (data.code === codigo.value) {
+        updateGameState(data, false);
+      }
     });
 
     socket.value.on('forceLogout', () => {
@@ -145,6 +156,14 @@ export const useGameStore = defineStore('game', () => {
 
     socket.value.on('error', (error: any) => {
       console.error('Erro no socket:', error);
+    });
+
+    // Listener para o estado inicial do jogo
+    socket.value.on('initialState', (data: GameState) => {
+      if (data.code === codigo.value) {
+        // Atualiza o estado sem emitir novos eventos
+        updateGameState(data, true);
+      }
     });
   };
 
@@ -181,8 +200,8 @@ export const useGameStore = defineStore('game', () => {
     emitGameUpdate();
   };
 
-  const updateGameState = (data: GameState) => {
-    if (data.code === lastSentData.value?.code) {
+  const updateGameState = (data: GameState, isInitial: boolean = false) => {
+    if (data.code === codigo.value) {
       code.value = data.code;
       deuceRule.value = data.deuceRule;
       setType.value = data.setType;
@@ -197,11 +216,13 @@ export const useGameStore = defineStore('game', () => {
       player2Score.value = data.player2Score;
       setPlayer1.value = data.setPlayer1;
       setPlayer2.value = data.setPlayer2;
-      
       player1Games.value = data.scores.player1;
       player2Games.value = data.scores.player2;
       
-      lastSentData.value = data;
+      // Atualiza lastSentData apenas se não for a inicialização
+      if (!isInitial) {
+        lastSentData.value = data;
+      }
     }
   };
 
@@ -226,7 +247,7 @@ export const useGameStore = defineStore('game', () => {
       setType: setType.value,
       timer: timer.value
     };
-
+console.log("emitGameUpdate",data)
     if (socket.value && JSON.stringify(lastSentData.value) !== JSON.stringify(data)) {
       lastSentData.value = data;
       if (debounceTimeout.value) clearTimeout(debounceTimeout.value);

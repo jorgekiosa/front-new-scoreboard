@@ -514,7 +514,7 @@ const emitUpdate = (data) => {
     deuceRule: gameStore.deuceRule,
     timer: gameStore.timer,
   };
-
+console.log("GAMEDATA",gameData)
   if (JSON.stringify(gameStore.lastSentData) !== JSON.stringify(gameData)) {
     gameStore.lastSentData = gameData;
     clearTimeout(gameStore.debounceTimeout);
@@ -562,6 +562,7 @@ const retrievedData = () => {
 
   gameStore.socket.on('gameUpdated', (data) => {
     if (data.code === route.query.code) {
+      console.log("DATA",data)
       gameStore.updateGameState(data);
     }
   });
@@ -655,13 +656,10 @@ watch(
    // Restaura o timer ao recarregar a página
   onMounted(() => {
     gameStore.initSocket(route.query.code);
-    setupInitialListeners();
-    //connectSocket()
-    //listOneScore()
-    retrievedData()
-    gameStore.socket.emit('requestToken');
-    //socket.emit('getGame', { code: route.query.code || '' });
-    gameStore.socket.emit('getTimer', { code: route.query.code || '' });
+    // Solicita os dados do jogo ao montar o componente
+    if (gameStore.socket) {
+      gameStore.socket.emit('getTimer', { code: route.query.code || '' });
+    }
   });
 
 const resetTime = () => {
