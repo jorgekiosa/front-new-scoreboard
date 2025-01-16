@@ -108,6 +108,7 @@ export const useGameStore = defineStore('game', () => {
       // Solicita o estado atual do jogo ao conectar
       if (codigo.value) {
         socket.value?.emit('getGame', { code: codigo.value });
+        socket.value?.emit('getTimer', { code: codigo.value || '' })
         //emitGameUpdate();
       }
     });
