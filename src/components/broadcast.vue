@@ -31,7 +31,7 @@
               </div>
               <div class="d-flex" v-if="data?.gameOver==false" :class="
                   team1.totalScore=='VT'?'total-score bg-points fs-4 fw-bolder text-whie px-4 py-2':
-                  team1.totalScore==40&&team2.totalScore==40&&data?.deuceRule==='goldenPoint'?'total-score fs-4 fw-bolder text-white bg-gold-point border-gold-point px-4 py-2':
+                  team1.totalScore==40&&team2.totalScore==40&&data?.deuceRule==='goldenPoint'?'total-score fs-4 fw-bolder text-white bg-gold-point border-gold-point px-3 py-2':
                   'total-score bg-points fs-4 fw-bolder text-white px-3 py-2'">
                   {{team1.totalScore}}
               </div>
@@ -58,7 +58,7 @@
               </div>
               <div class="d-flex" v-if="data?.gameOver==false" :class="
                   team2.totalScore=='VT'?'total-score bg-points fs-4 fw-bolder text-whie px-4 py-2':
-                  team1.totalScore==40&&team2.totalScore==40&&data?.deuceRule==='goldenPoint'?'total-score fs-4 fw-bolder text-white bg-gold-point border-gold-point px-4 py-2':
+                  team1.totalScore==40&&team2.totalScore==40&&data?.deuceRule==='goldenPoint'?'total-score fs-4 fw-bolder text-white bg-gold-point border-gold-point px-3 py-2':
                   'total-score bg-points fs-4 fw-bolder text-white px-3 py-2'">
                   {{team2.totalScore}}
               </div>
@@ -232,10 +232,13 @@ onUnmounted(() => {
 .bg-gold-point {
   clip-path: polygon(0 0, 86% 0, 100% 100%, 17% 100%);
   margin-left: -13px;
+  width:50px;
+  text-align:center
 }
 .bg-points {
   clip-path: polygon(0 0, 86% 0, 100% 100%, 17% 100%);
   margin-left: -13px;
+  width: 50px;
 }
 .bg-points{
   background: linear-gradient(90deg, #C553FF 0%, #3D124C 100%);
@@ -261,7 +264,7 @@ onUnmounted(() => {
 }
 .scoreboard {
   /* max-width: 350px; */
-  max-width: 390px;
+  max-width: 400px;
 }
 
 .team-name {
