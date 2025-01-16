@@ -28,6 +28,7 @@ interface GameState {
   deuceRule: string;
   timer: number;
   setType: string;
+  isTimerUpdate?: boolean;
 }
 
 export const useGameStore = defineStore('game', () => {
@@ -185,23 +186,26 @@ export const useGameStore = defineStore('game', () => {
 
   const updateGameState = (data: GameState) => {
     if (data.code === lastSentData.value?.code) {
+      if (data.isTimerUpdate) {
+        timer.value = data.timer;
+        return;
+      }
+      
       code.value = data.code;
       deuceRule.value = data.deuceRule;
       setType.value = data.setType;
       currentSet.value = data.currentSet;
-      sponsor.value = data.sponsor;
       hideBoard.value = data.hideBoard;
       gameOver.value = data.gameOver;
-      player1.value = data.player1;
-      player2.value = data.player2;
-      timer.value = data.timer;
       player1Score.value = data.player1Score;
       player2Score.value = data.player2Score;
       setPlayer1.value = data.setPlayer1;
       setPlayer2.value = data.setPlayer2;
-      
       player1Games.value = data.scores.player1;
       player2Games.value = data.scores.player2;
+      sponsor.value = data.sponsor;
+      player1.value = data.player1;
+      player2.value = data.player2;
       
       lastSentData.value = data;
     }
@@ -241,11 +245,40 @@ export const useGameStore = defineStore('game', () => {
   // Timer functions
   const toggleTimer = () => {
     if (socket.value) {
+      const timerData: GameState = {
+        code: codigo.value || '',
+        currentSet: currentSet.value,
+        player1: player1.value,
+        setPlayer1: setPlayer1.value,
+        player2: player2.value,
+        setPlayer2: setPlayer2.value,
+        sponsor: sponsor.value,
+        scores: scores.value,
+        hideBoard: hideBoard.value,
+        gameOver: gameOver.value,
+        deuceRule: deuceRule.value,
+        timer: timer.value,
+        setType: setType.value,
+        isTimerUpdate: true
+      };
+
       socket.value.emit('toggleTimer', { 
         code: lastSentData.value?.code || '',
         timer: timer.value,
         isRunning: !isRunning.value
       });
+
+      isRunning.value = !isRunning.value;
+      if (isRunning.value) {
+        interval = window.setInterval(() => {
+          timer.value++;
+        }, 1000);
+      } else {
+        if (interval) {
+          clearInterval(interval);
+          interval = null;
+        }
+      }
     }
   };
 
