@@ -116,16 +116,18 @@ export const useGameStore = defineStore('game', () => {
 
     socket.value.on('timerUpdated', (data: { code: string; timer: number; isRunning: boolean }) => {
       if (data.code === lastSentData.value?.code) {
-        timer.value = data.timer;
-        isRunning.value = data.isRunning;
+        if (isRunning.value !== data.isRunning) {
+          timer.value = data.timer;
+          isRunning.value = data.isRunning;
         
-        if (isRunning.value && !interval) {
-          interval = window.setInterval(() => {
-            timer.value++;
-          }, 1000);
-        } else if (!isRunning.value && interval) {
-          clearInterval(interval);
-          interval = null;
+          if (isRunning.value && !interval) {
+            interval = window.setInterval(() => {
+              timer.value++;
+            }, 1000);
+          } else if (!isRunning.value && interval) {
+            clearInterval(interval);
+            interval = null;
+          }
         }
       }
     });
@@ -239,18 +241,11 @@ export const useGameStore = defineStore('game', () => {
   // Timer functions
   const toggleTimer = () => {
     if (socket.value) {
-      socket.value.emit('toggleTimer', { code: lastSentData.value?.code || '' });
-    }
-    
-    if (!isRunning.value) {
-      isRunning.value = true;
-      interval = window.setInterval(() => {
-        timer.value++;
-      }, 1000);
-    } else {
-      if (interval) clearInterval(interval);
-      isRunning.value = false;
-      interval = null;
+      socket.value.emit('toggleTimer', { 
+        code: lastSentData.value?.code || '',
+        timer: timer.value,
+        isRunning: !isRunning.value
+      });
     }
   };
 

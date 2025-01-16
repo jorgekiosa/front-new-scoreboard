@@ -27,7 +27,7 @@
             </div>
             <div class="text-white d-flex justify-content-between align-items-center">
               <div class="d-flex align-items-center">
-                <span v-for="(value, set) in data?.setPlayer1" :key="set" v-if="value!==null" class="bg-set px-3 py-2 set-score fs-4 fw-bolder me-1">{{value}}</span>
+                <span  v-for="([key, value]) in Object.entries(data?.setPlayer1 || {}).filter(([key, value]) => value !== null)" :key="key" class="bg-set px-3 py-2 set-score fs-4 fw-bolder me-1">{{value}}</span>
               </div>
               <div class="d-flex" v-if="data?.gameOver==false" :class="
                   team1.totalScore=='VT'?'total-score bg-points fs-4 fw-bolder text-whie px-4 py-2':
@@ -54,7 +54,7 @@
             </div>
             <div class="text-white d-flex justify-content-between align-items-center">
               <div class="d-flex align-items-center">
-                <span v-for="(value, set) in data?.setPlayer2" :key="set" v-if="value!==null" class="bg-set px-3 py-2 set-score fs-4 fw-bolder me-1">{{value}}</span>
+                <span  v-for="([key, value]) in Object.entries(data?.setPlayer2 || {}).filter(([key, value]) => value !== null)" :key="key" class="bg-set px-3 py-2 set-score fs-4 fw-bolder me-1">{{value}}</span>
               </div>
               <div class="d-flex" v-if="data?.gameOver==false" :class="
                   team2.totalScore=='VT'?'total-score bg-points fs-4 fw-bolder text-whie px-4 py-2':
@@ -161,6 +161,9 @@ const updateLocalState=(updatedData)=>{
   };
 }
 
+const filteredSetPlayer2 = computed(() => {
+  return data?.setPlayer2.filter((value) => value !== null);
+});
 const setupSocketListeners=()=> {
   if (isListening) return;
   isListening = true;
