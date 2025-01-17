@@ -263,7 +263,7 @@ console.log("emitGameUpdate",data)
   // Timer functions
   const toggleTimer = () => {
     if (socket.value) {
-      emitGameUpdate();
+      socket.value?.emit('getGame', { code: codigo.value });
       socket.value.emit('toggleTimer', { code: lastSentData.value?.code || '' });
     }
     
